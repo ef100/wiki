@@ -1,0 +1,33 @@
+@startuml
+autonumber
+participant C端用户
+participant 微门店前端
+participant 微门店C端BFF
+participant C端SSO服务
+participant 微信开放平台
+
+
+title 时序图
+
+
+C端用户 -> 微门店前端: 访问
+微门店前端 -> 微门店C端BFF: 请求当前用户信息
+微门店前端 <- 微门店C端BFF: 返回用户信息失败
+
+ == 统一登录 ==
+微门店前端 -> C端SSO服务: 跳转统一登录
+C端SSO服务 -> 微信开放平台: 转到微信授权页
+C端用户 <-- 微信开放平台: 请求用户授权
+C端用户 --> 微信开放平台: 用户同意授权
+C端SSO服务 <- 微信开放平台: 返回授权码Code到SSO页面
+
+C端SSO服务 -> 微信开放平台: SSO服务端用Code换取OpenId
+C端SSO服务 <- 微信开放平台: 返回OpenId及其它用户信息
+... 创建customerUuid及生成customerToken ...
+
+C端SSO服务 -> 微门店前端: 返回customerToken
+
+ == 请求BFF接口 ==
+微门店前端 -> 微门店C端BFF: 带customerToken请求后端BFF接口
+
+@enduml
